@@ -29,8 +29,18 @@ namespace API
         public void ConfigureServices(IServiceCollection services)
         {
             // Inject our data context so we can use the data in our app
-            services.AddDbContext<DataContext>(opt => {
+            services.AddDbContext<DataContext>(opt =>
+            {
                 opt.UseSqlite(Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            // Configure cors
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
+                });
             });
 
             // Make it possible to use web api controllers
@@ -51,6 +61,8 @@ namespace API
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseCors("CorsPolicy");
 
             app.UseEndpoints(endpoints =>
             {
